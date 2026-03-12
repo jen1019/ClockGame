@@ -376,6 +376,8 @@ function onPointerMove(e) {
   if (dragging === 'minute') {
     let minute = Math.round(angle / 6);
     if (minute === 60) minute = 0;
+    // 依難易度吸附到對應刻度
+    minute = snapMinute(minute, state.difficulty);
     setSetClockMinute(minute);
   } else if (dragging === 'hour') {
     // 將角度轉為 1~12
@@ -420,6 +422,20 @@ function svgPoint(e) {
     x: (e.clientX - rect.left) * 300 / rect.width,
     y: (e.clientY - rect.top) * 300 / rect.height
   };
+}
+
+// 依難易度將分鐘吸附到最近的合法刻度
+function snapMinute(minute, difficulty) {
+  if (difficulty === 'easy') {
+    // 吸附到 0, 15, 30, 45
+    return Math.round(minute / 15) * 15 % 60;
+  }
+  if (difficulty === 'normal') {
+    // 吸附到 0, 5, 10, ..., 55
+    return Math.round(minute / 5) * 5 % 60;
+  }
+  // hard：不吸附
+  return minute;
 }
 
 function enableSetClockInteraction() {
