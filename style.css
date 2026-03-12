@@ -1,0 +1,357 @@
+/* === Reset & Base === */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft JhengHei", sans-serif;
+  background: #f7f8fa;
+  color: #333;
+  line-height: 1.5;
+  overflow-x: hidden;
+}
+
+#app {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 8px 12px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* === Top Bar === */
+#top-bar {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 4px 0;
+}
+
+#top-bar h1 {
+  font-size: 1.2rem;
+  color: #222;
+}
+
+#btn-settings {
+  padding: 6px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #555;
+}
+
+#btn-settings:hover {
+  background: #eee;
+}
+
+#btn-settings.open {
+  background: #4a90d9;
+  color: #fff;
+  border-color: #4a90d9;
+}
+
+/* === Breadcrumb === */
+#breadcrumb {
+  width: 100%;
+  padding: 6px 0;
+  font-size: 0.85rem;
+  color: #666;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.crumb-sep {
+  color: #bbb;
+}
+
+#crumb-mode, #crumb-diff {
+  font-weight: 600;
+  color: #4a90d9;
+}
+
+#crumb-stats {
+  color: #888;
+}
+
+/* === Settings Panel === */
+#settings-panel {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 14px;
+  margin-bottom: 6px;
+}
+
+#settings-panel.hidden {
+  display: none;
+}
+
+.settings-section {
+  margin-bottom: 12px;
+}
+
+.settings-section:last-child {
+  margin-bottom: 0;
+}
+
+.settings-label {
+  font-size: 0.8rem;
+  color: #888;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* === Button Groups === */
+.button-group {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.button-group button {
+  padding: 7px 14px;
+  border: 2px solid #ccc;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: #555;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.button-group button:hover {
+  border-color: #999;
+}
+
+.button-group button.active {
+  background: #4a90d9;
+  border-color: #4a90d9;
+  color: #fff;
+}
+
+.btn-outline {
+  padding: 7px 14px;
+  border: 2px solid #e67e22;
+  border-radius: 8px;
+  background: #fff;
+  color: #e67e22;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-outline:hover {
+  background: #e67e22;
+  color: #fff;
+}
+
+/* === Question Area === */
+#question-area {
+  width: 100%;
+  text-align: center;
+  padding: 6px 0;
+}
+
+#question-text {
+  font-size: 1.2rem;
+  font-weight: 600;
+  min-height: 1.6em;
+  color: #222;
+}
+
+#speech-buttons {
+  margin-top: 6px;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+}
+
+#speech-buttons button {
+  padding: 5px 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  background: #fff;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+#speech-buttons button:hover {
+  background: #eee;
+}
+
+/* === Clock — 盡量放大 === */
+#clock-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 4px 0;
+}
+
+#clock {
+  width: 90vw;
+  max-width: 520px;
+  height: auto;
+  touch-action: none;
+  display: block;
+}
+
+/* === Set-clock controls === */
+#set-clock-controls {
+  text-align: center;
+  padding: 2px 0;
+}
+
+.hint {
+  margin-top: 2px;
+  font-size: 0.8rem;
+  color: #999;
+}
+
+/* === Read-clock controls === */
+#read-clock-controls {
+  text-align: center;
+  padding: 6px 0;
+}
+
+#read-clock-controls.hidden {
+  display: none;
+}
+
+.select-group {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  align-items: center;
+}
+
+.select-group label {
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.select-group select {
+  padding: 6px 10px;
+  font-size: 1.05rem;
+  border: 2px solid #ccc;
+  border-radius: 6px;
+  background: #fff;
+}
+
+/* === Result === */
+#result-area {
+  min-height: 1.8em;
+  text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
+  padding: 2px 0;
+}
+
+#result-area.correct {
+  color: #27ae60;
+}
+
+#result-area.wrong {
+  color: #e74c3c;
+}
+
+/* === Action Buttons === */
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 4px 0;
+}
+
+.action-buttons button {
+  padding: 10px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  color: #fff;
+}
+
+#btn-submit {
+  background: #4a90d9;
+}
+
+#btn-submit:hover {
+  background: #3a7bc8;
+}
+
+#btn-next {
+  background: #6c757d;
+}
+
+#btn-next:hover {
+  background: #5a6268;
+}
+
+/* === Stats === */
+#stats-area {
+  width: 100%;
+  padding: 10px;
+  background: #eef2f7;
+  border-radius: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  font-size: 0.9rem;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+/* === SVG hand hover hints === */
+.hand-interactive {
+  cursor: grab;
+}
+
+.hand-interactive:hover {
+  filter: brightness(1.3);
+}
+
+/* === Responsive === */
+@media (min-width: 600px) {
+  #clock {
+    max-width: 520px;
+  }
+}
+
+@media (max-width: 400px) {
+  #top-bar h1 {
+    font-size: 1rem;
+  }
+
+  #question-text {
+    font-size: 1.05rem;
+  }
+
+  .button-group button {
+    padding: 6px 10px;
+    font-size: 0.8rem;
+  }
+
+  .action-buttons button {
+    padding: 9px 16px;
+    font-size: 0.9rem;
+  }
+
+  #stats-area {
+    gap: 10px;
+    font-size: 0.8rem;
+  }
+}

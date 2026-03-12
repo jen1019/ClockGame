@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>時鐘練習遊戲</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+
+    <!-- 頂部列：標題 + 設定齒輪 -->
+    <header id="top-bar">
+      <h1>時鐘練習遊戲</h1>
+      <button id="btn-settings" aria-label="設定">&#9881; 設定</button>
+    </header>
+
+    <!-- 麵包屑：顯示目前設定摘要 -->
+    <div id="breadcrumb">
+      <span id="crumb-mode">聽時間撥時鐘</span>
+      <span class="crumb-sep">／</span>
+      <span id="crumb-diff">普通</span>
+      <span class="crumb-sep">／</span>
+      <span id="crumb-stats">0 / 0</span>
+    </div>
+
+    <!-- 設定面板（預設收合） -->
+    <div id="settings-panel" class="hidden">
+      <div class="settings-section">
+        <div class="settings-label">遊戲模式</div>
+        <div class="button-group" id="mode-buttons">
+          <button data-mode="set-clock" class="active">聽時間撥時鐘</button>
+          <button data-mode="read-clock">看時鐘回答時間</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">難易度</div>
+        <div class="button-group" id="difficulty-buttons">
+          <button data-diff="easy">簡單</button>
+          <button data-diff="normal" class="active">普通</button>
+          <button data-diff="hard">困難</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <button id="btn-reset" class="btn-outline">重新開始（歸零統計）</button>
+      </div>
+    </div>
+
+    <!-- 題目區 -->
+    <div id="question-area">
+      <p id="question-text"></p>
+      <div id="speech-buttons">
+        <button id="btn-speak">播放題目</button>
+        <button id="btn-speak-again">再聽一次</button>
+      </div>
+    </div>
+
+    <!-- 時鐘區：盡量放大 -->
+    <div id="clock-container">
+      <svg id="clock" viewBox="0 0 300 300"></svg>
+    </div>
+
+    <!-- 模式 A：提示 -->
+    <div id="set-clock-controls">
+      <p class="hint">拖曳時針或分針調整時間</p>
+    </div>
+
+    <!-- 模式 B：下拉選單 -->
+    <div id="read-clock-controls" class="hidden">
+      <div class="select-group">
+        <label>小時
+          <select id="select-hour"></select>
+        </label>
+        <label>分鐘
+          <select id="select-minute"></select>
+        </label>
+      </div>
+    </div>
+
+    <!-- 結果訊息區 -->
+    <div id="result-area"></div>
+
+    <!-- 動作按鈕 -->
+    <div class="action-buttons">
+      <button id="btn-submit">送出答案</button>
+      <button id="btn-next">下一題</button>
+    </div>
+
+    <!-- 成績統計區 -->
+    <div id="stats-area">
+      <span>已作答：<strong id="stat-total">0</strong> 題</span>
+      <span>答對：<strong id="stat-correct">0</strong> 題</span>
+      <span>正確率：<strong id="stat-rate">0</strong>%</span>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
