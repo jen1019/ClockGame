@@ -10,6 +10,7 @@ function getDefaultState() {
     lastQuestion: null,       // { hour, minute } | null
     answerResult: null,       // { isCorrect, message } | null
     stats: { total: 0, correct: 0 },
+    streak: 0,
     setClockAnswer: { hour: 12, minute: 0 },
     settingsOpen: false,
     autoNextTimer: null
@@ -570,18 +571,23 @@ function submitAnswer() {
   }
 
   state.stats.total++;
-  if (state.answerResult.isCorrect) state.stats.correct++;
-
-  // 播放音效
   if (state.answerResult.isCorrect) {
+    state.stats.correct++;
+    state.streak++;
     playCorrectSound();
   } else {
+    state.streak = 0;
     playWrongSound();
   }
 
   renderResult();
   renderStats();
   updateBreadcrumb();
+
+  // 連續答對 10 題，大慶祝
+  if (state.streak > 0 && state.streak % 10 === 0) {
+    showCelebration();
+  }
 
   // 答對後 5 秒自動進入下一題
   clearAutoNext();
@@ -693,8 +699,68 @@ function goToNextQuestion() {
 function resetStats() {
   clearAutoNext();
   state.stats = { total: 0, correct: 0 };
+  state.streak = 0;
   state.answerResult = null;
   generateAndShow();
+}
+
+// ============================================================
+// 慶祝動畫（連續答對 10 題）
+// ============================================================
+
+const CELEBRATE_MESSAGES = [
+  '你太厲害了！',
+  '超級棒！繼續加油！',
+  '哇！時鐘大師！',
+  '太強了！完美連續！',
+  '好厲害呀！你是天才！',
+  '連續十題全對！好棒好棒！'
+];
+
+const CELEBRATE_EMOJIS = ['🎉', '🌟', '⭐', '🏆', '💪', '👏', '🎊', '❤️', '🥳', '✨'];
+
+function showCelebration() {
+  // 建立覆蓋層
+  var overlay = document.createElement('div');
+  overlay.id = 'celebration-overlay';
+
+  // 隨機訊息
+  var msg = CELEBRATE_MESSAGES[Math.floor(Math.random() * CELEBRATE_MESSAGES.length)];
+
+  // 產生紙花
+  var confettiHtml = '';
+  for (var i = 0; i < 40; i++) {
+    var emoji = CELEBRATE_EMOJIS[Math.floor(Math.random() * CELEBRATE_EMOJIS.length)];
+    var left = Math.random() * 100;
+    var delay = Math.random() * 1.5;
+    var size = 18 + Math.random() * 20;
+    confettiHtml += '<span class="confetti" style="left:' + left + '%;animation-delay:' + delay.toFixed(2) + 's;font-size:' + size.toFixed(0) + 'px;">' + emoji + '</span>';
+  }
+
+  overlay.innerHTML = confettiHtml +
+    '<div class="celebrate-content">' +
+      '<div class="celebrate-emoji">🏆</div>' +
+      '<div class="celebrate-streak">連續 ' + state.streak + ' 題全對！</div>' +
+      '<div class="celebrate-msg">' + msg + '</div>' +
+      '<button class="celebrate-btn" onclick="closeCelebration()">繼續挑戰</button>' +
+    '</div>';
+
+  document.body.appendChild(overlay);
+
+  // 6 秒後自動關閉
+  setTimeout(function() {
+    closeCelebration();
+  }, 6000);
+}
+
+function closeCelebration() {
+  var overlay = document.getElementById('celebration-overlay');
+  if (overlay) {
+    overlay.classList.add('fade-out');
+    setTimeout(function() {
+      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
+    }, 400);
+  }
 }
 
 // ============================================================
