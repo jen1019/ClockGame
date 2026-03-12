@@ -584,8 +584,8 @@ function submitAnswer() {
   renderStats();
   updateBreadcrumb();
 
-  // 連續答對 10 題，大慶祝
-  if (state.streak > 0 && state.streak % 10 === 0) {
+  // 連續答對 5 題，大慶祝
+  if (state.streak > 0 && state.streak % 5 === 0) {
     showCelebration();
   }
 
@@ -746,11 +746,6 @@ function showCelebration() {
     '</div>';
 
   document.body.appendChild(overlay);
-
-  // 6 秒後自動關閉
-  setTimeout(function() {
-    closeCelebration();
-  }, 6000);
 }
 
 function closeCelebration() {
