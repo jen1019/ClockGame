@@ -207,6 +207,55 @@ function stopSpeaking() {
 }
 
 // ============================================================
+// 音效（Web Audio API）
+// ============================================================
+
+let audioCtx = null;
+
+function getAudioCtx() {
+  if (!audioCtx) {
+    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  }
+  return audioCtx;
+}
+
+function playCorrectSound() {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    // 上升兩音：Do → Mi
+    osc.frequency.setValueAtTime(523, ctx.currentTime);       // C5
+    osc.frequency.setValueAtTime(659, ctx.currentTime + 0.12); // E5
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.35);
+  } catch (e) { /* 音效失敗不影響遊戲 */ }
+}
+
+function playWrongSound() {
+  try {
+    const ctx = getAudioCtx();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.type = 'sine';
+    // 下降兩音：Mi → Do
+    osc.frequency.setValueAtTime(330, ctx.currentTime);       // E4
+    osc.frequency.setValueAtTime(262, ctx.currentTime + 0.15); // C4
+    gain.gain.setValueAtTime(0.3, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+    osc.start(ctx.currentTime);
+    osc.stop(ctx.currentTime + 0.4);
+  } catch (e) { /* 音效失敗不影響遊戲 */ }
+}
+
+// ============================================================
 // 時鐘 SVG
 // ============================================================
 
@@ -472,6 +521,13 @@ function submitAnswer() {
 
   state.stats.total++;
   if (state.answerResult.isCorrect) state.stats.correct++;
+
+  // 播放音效
+  if (state.answerResult.isCorrect) {
+    playCorrectSound();
+  } else {
+    playWrongSound();
+  }
 
   renderResult();
   renderStats();
