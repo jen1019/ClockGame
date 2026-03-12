@@ -207,60 +207,86 @@ function stopSpeaking() {
 }
 
 // ============================================================
-// 音效（Web Audio API）
+// 音效（WAV Blob + Audio 元素）
 // ============================================================
+
+// 產生 WAV blob URL：tones = [{freq, duration}], sampleRate 預設 22050
+function buildWavUrl(tones, sampleRate) {
+  sampleRate = sampleRate || 22050;
+  var totalSamples = 0;
+  tones.forEach(function(t) { totalSamples += Math.floor(t.duration * sampleRate); });
+
+  var buffer = new ArrayBuffer(44 + totalSamples * 2);
+  var view = new DataView(buffer);
+
+  // WAV header
+  function writeStr(offset, str) {
+    for (var i = 0; i < str.length; i++) view.setUint8(offset + i, str.charCodeAt(i));
+  }
+  writeStr(0, 'RIFF');
+  view.setUint32(4, 36 + totalSamples * 2, true);
+  writeStr(8, 'WAVE');
+  writeStr(12, 'fmt ');
+  view.setUint32(16, 16, true);
+  view.setUint16(20, 1, true);       // PCM
+  view.setUint16(22, 1, true);       // mono
+  view.setUint32(24, sampleRate, true);
+  view.setUint32(28, sampleRate * 2, true);
+  view.setUint16(32, 2, true);
+  view.setUint16(34, 16, true);      // 16-bit
+  writeStr(36, 'data');
+  view.setUint32(40, totalSamples * 2, true);
+
+  // 寫入音訊取樣
+  var offset = 44;
+  tones.forEach(function(t) {
+    var samples = Math.floor(t.duration * sampleRate);
+    for (var i = 0; i < samples; i++) {
+      var env = 1 - (i / samples);   // 線性衰減
+      var val = Math.sin(2 * Math.PI * t.freq * i / sampleRate) * env * 0.8;
+      view.setInt16(offset, val * 32767, true);
+      offset += 2;
+    }
+  });
+
+  var blob = new Blob([buffer], { type: 'audio/wav' });
+  return URL.createObjectURL(blob);
+}
+
+// 預先產生音效 URL
+var correctSoundUrl = null;
+var wrongSoundUrl = null;
+
+function ensureSounds() {
+  if (!correctSoundUrl) {
+    correctSoundUrl = buildWavUrl([
+      { freq: 523, duration: 0.15 },  // C5
+      { freq: 659, duration: 0.25 }   // E5
+    ]);
+  }
+  if (!wrongSoundUrl) {
+    wrongSoundUrl = buildWavUrl([
+      { freq: 330, duration: 0.2 },   // E4
+      { freq: 220, duration: 0.3 }    // A3
+    ]);
+  }
+}
 
 function playCorrectSound() {
   try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // 第一個音：C5
-    var osc1 = ctx.createOscillator();
-    var g1 = ctx.createGain();
-    osc1.type = 'sine';
-    osc1.frequency.value = 523;
-    g1.gain.value = 0.5;
-    osc1.connect(g1);
-    g1.connect(ctx.destination);
-    osc1.start(0);
-    osc1.stop(ctx.currentTime + 0.15);
-    // 第二個音：E5
-    var osc2 = ctx.createOscillator();
-    var g2 = ctx.createGain();
-    osc2.type = 'sine';
-    osc2.frequency.value = 659;
-    g2.gain.value = 0.5;
-    osc2.connect(g2);
-    g2.connect(ctx.destination);
-    osc2.start(ctx.currentTime + 0.15);
-    osc2.stop(ctx.currentTime + 0.4);
-    osc2.onended = function() { ctx.close(); };
+    ensureSounds();
+    var audio = new Audio(correctSoundUrl);
+    audio.volume = 1.0;
+    audio.play();
   } catch (e) { /* 音效失敗不影響遊戲 */ }
 }
 
 function playWrongSound() {
   try {
-    var ctx = new (window.AudioContext || window.webkitAudioContext)();
-    // 第一個音：E4
-    var osc1 = ctx.createOscillator();
-    var g1 = ctx.createGain();
-    osc1.type = 'square';
-    osc1.frequency.value = 330;
-    g1.gain.value = 0.4;
-    osc1.connect(g1);
-    g1.connect(ctx.destination);
-    osc1.start(0);
-    osc1.stop(ctx.currentTime + 0.2);
-    // 第二個音：C4
-    var osc2 = ctx.createOscillator();
-    var g2 = ctx.createGain();
-    osc2.type = 'square';
-    osc2.frequency.value = 220;
-    g2.gain.value = 0.4;
-    osc2.connect(g2);
-    g2.connect(ctx.destination);
-    osc2.start(ctx.currentTime + 0.2);
-    osc2.stop(ctx.currentTime + 0.5);
-    osc2.onended = function() { ctx.close(); };
+    ensureSounds();
+    var audio = new Audio(wrongSoundUrl);
+    audio.volume = 1.0;
+    audio.play();
   } catch (e) { /* 音效失敗不影響遊戲 */ }
 }
 
