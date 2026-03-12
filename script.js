@@ -273,7 +273,18 @@ function renderClockFace() {
     svg += `<line x1="${CX + r1 * Math.cos(angle)}" y1="${CY + r1 * Math.sin(angle)}" x2="${CX + r2 * Math.cos(angle)}" y2="${CY + r2 * Math.sin(angle)}" stroke="#555" stroke-width="${isMajor ? 2.5 : 1}"/>`;
   }
 
-  // 數字 1~12
+  // 分鐘數字（外圈 5, 10, 15...55）
+  for (let m = 5; m <= 55; m += 5) {
+    const angle = (m * 6 - 90) * Math.PI / 180;
+    const mr = R + 13;
+    const mx = CX + mr * Math.cos(angle);
+    const my = CY + mr * Math.sin(angle);
+    svg += `<text x="${mx}" y="${my}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#999" class="minute-label">${m}</text>`;
+  }
+  // 外圈 00/60 位置
+  svg += `<text x="${CX}" y="${CY - R - 13}" text-anchor="middle" dominant-baseline="central" font-size="11" font-weight="400" fill="#999" class="minute-label">0</text>`;
+
+  // 數字 1~12（小時）
   for (let n = 1; n <= 12; n++) {
     const angle = (n * 30 - 90) * Math.PI / 180;
     const nr = R - 30;
@@ -294,6 +305,12 @@ function renderClockFace() {
 
   // 中心圓點
   svg += `<circle cx="${CX}" cy="${CY}" r="6" fill="#333"/>`;
+
+  // 拖曳氣泡（預設隱藏）
+  svg += `<g id="drag-bubble" style="display:none;">`;
+  svg += `<circle id="bubble-bg" cx="0" cy="0" r="16" fill="#4a90d9" opacity="0.9"/>`;
+  svg += `<text id="bubble-text" x="0" y="0" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="700" fill="#fff">0</text>`;
+  svg += `</g>`;
 
   clockSvg.innerHTML = svg;
 }
@@ -374,22 +391,44 @@ function onPointerMove(e) {
   if (dragging === 'minute') {
     let minute = Math.round(angle / 6);
     if (minute === 60) minute = 0;
-    // 依難易度吸附到對應刻度
     minute = snapMinute(minute, state.difficulty);
     setSetClockMinute(minute);
+    showDragBubble(minute);
   } else if (dragging === 'hour') {
-    // 將角度轉為 1~12
     let hour = Math.round(angle / 30);
     if (hour === 0) hour = 12;
     setSetClockHour(hour);
+    hideDragBubble();
   }
 }
 
 function onPointerUp(e) {
   if (dragging) {
+    hideDragBubble();
     dragging = null;
     clockSvg.releasePointerCapture(e.pointerId);
   }
+}
+
+function showDragBubble(minute) {
+  const bubble = document.getElementById('drag-bubble');
+  if (!bubble) return;
+  // 氣泡位置在分針末端外側
+  const rad = (minute * 6 - 90) * Math.PI / 180;
+  const bx = CX + (MINUTE_HAND_LEN + 22) * Math.cos(rad);
+  const by = CY + (MINUTE_HAND_LEN + 22) * Math.sin(rad);
+  bubble.style.display = '';
+  document.getElementById('bubble-bg').setAttribute('cx', bx);
+  document.getElementById('bubble-bg').setAttribute('cy', by);
+  const txt = document.getElementById('bubble-text');
+  txt.setAttribute('x', bx);
+  txt.setAttribute('y', by);
+  txt.textContent = String(minute).padStart(2, '0');
+}
+
+function hideDragBubble() {
+  const bubble = document.getElementById('drag-bubble');
+  if (bubble) bubble.style.display = 'none';
 }
 
 // 取得指針末端座標
@@ -417,8 +456,8 @@ function distToSegment(p, a, b) {
 function svgPoint(e) {
   const rect = clockSvg.getBoundingClientRect();
   return {
-    x: (e.clientX - rect.left) * 300 / rect.width,
-    y: (e.clientY - rect.top) * 300 / rect.height
+    x: (e.clientX - rect.left) * 340 / rect.width - 20,
+    y: (e.clientY - rect.top) * 340 / rect.height - 20
   };
 }
 
