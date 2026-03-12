@@ -210,45 +210,57 @@ function stopSpeaking() {
 // 音效（Web Audio API）
 // ============================================================
 
-let audioCtx = null;
-
-function getAudioCtx() {
-  if (!audioCtx) {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-  }
-  return audioCtx;
-}
-
-function playTone(freq, startTime, duration, ctx, dest) {
-  const osc = ctx.createOscillator();
-  const gain = ctx.createGain();
-  osc.connect(gain);
-  gain.connect(dest);
-  osc.type = 'sine';
-  osc.frequency.value = freq;
-  gain.gain.setValueAtTime(0.35, startTime);
-  gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
-  osc.start(startTime);
-  osc.stop(startTime + duration);
-}
-
 function playCorrectSound() {
   try {
-    const ctx = getAudioCtx();
-    const t = ctx.currentTime;
-    // 上升兩音：Do → Mi
-    playTone(523, t, 0.15, ctx, ctx.destination);        // C5
-    playTone(659, t + 0.15, 0.2, ctx, ctx.destination);  // E5
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // 第一個音：C5
+    var osc1 = ctx.createOscillator();
+    var g1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.value = 523;
+    g1.gain.value = 0.5;
+    osc1.connect(g1);
+    g1.connect(ctx.destination);
+    osc1.start(0);
+    osc1.stop(ctx.currentTime + 0.15);
+    // 第二個音：E5
+    var osc2 = ctx.createOscillator();
+    var g2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.value = 659;
+    g2.gain.value = 0.5;
+    osc2.connect(g2);
+    g2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.15);
+    osc2.stop(ctx.currentTime + 0.4);
+    osc2.onended = function() { ctx.close(); };
   } catch (e) { /* 音效失敗不影響遊戲 */ }
 }
 
 function playWrongSound() {
   try {
-    const ctx = getAudioCtx();
-    const t = ctx.currentTime;
-    // 下降兩音：Mi → Do
-    playTone(330, t, 0.18, ctx, ctx.destination);        // E4
-    playTone(262, t + 0.18, 0.25, ctx, ctx.destination); // C4
+    var ctx = new (window.AudioContext || window.webkitAudioContext)();
+    // 第一個音：E4
+    var osc1 = ctx.createOscillator();
+    var g1 = ctx.createGain();
+    osc1.type = 'square';
+    osc1.frequency.value = 330;
+    g1.gain.value = 0.4;
+    osc1.connect(g1);
+    g1.connect(ctx.destination);
+    osc1.start(0);
+    osc1.stop(ctx.currentTime + 0.2);
+    // 第二個音：C4
+    var osc2 = ctx.createOscillator();
+    var g2 = ctx.createGain();
+    osc2.type = 'square';
+    osc2.frequency.value = 220;
+    g2.gain.value = 0.4;
+    osc2.connect(g2);
+    g2.connect(ctx.destination);
+    osc2.start(ctx.currentTime + 0.2);
+    osc2.stop(ctx.currentTime + 0.5);
+    osc2.onended = function() { ctx.close(); };
   } catch (e) { /* 音效失敗不影響遊戲 */ }
 }
 
