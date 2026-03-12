@@ -729,7 +729,7 @@ function showCelebration() {
 
   // 產生紙花
   var confettiHtml = '';
-  for (var i = 0; i < 40; i++) {
+  for (var i = 0; i < 120; i++) {
     var emoji = CELEBRATE_EMOJIS[Math.floor(Math.random() * CELEBRATE_EMOJIS.length)];
     var left = Math.random() * 100;
     var delay = Math.random() * 1.5;
