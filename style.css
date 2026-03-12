@@ -393,7 +393,7 @@ body {
 .confetti {
   position: absolute;
   top: -40px;
-  animation: confettiFall 3s ease-in forwards;
+  animation: confettiFall 3.5s ease-in infinite;
   pointer-events: none;
   z-index: 1;
 }
@@ -403,11 +403,11 @@ body {
     transform: translateY(0) rotate(0deg) scale(1);
     opacity: 1;
   }
-  80% {
+  85% {
     opacity: 1;
   }
   100% {
-    transform: translateY(100vh) rotate(720deg) scale(0.5);
+    transform: translateY(105vh) rotate(720deg) scale(0.5);
     opacity: 0;
   }
 }
