@@ -219,39 +219,36 @@ function getAudioCtx() {
   return audioCtx;
 }
 
+function playTone(freq, startTime, duration, ctx, dest) {
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+  osc.connect(gain);
+  gain.connect(dest);
+  osc.type = 'sine';
+  osc.frequency.value = freq;
+  gain.gain.setValueAtTime(0.35, startTime);
+  gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
+  osc.start(startTime);
+  osc.stop(startTime + duration);
+}
+
 function playCorrectSound() {
   try {
     const ctx = getAudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
+    const t = ctx.currentTime;
     // 上升兩音：Do → Mi
-    osc.frequency.setValueAtTime(523, ctx.currentTime);       // C5
-    osc.frequency.setValueAtTime(659, ctx.currentTime + 0.12); // E5
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.35);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.35);
+    playTone(523, t, 0.15, ctx, ctx.destination);        // C5
+    playTone(659, t + 0.15, 0.2, ctx, ctx.destination);  // E5
   } catch (e) { /* 音效失敗不影響遊戲 */ }
 }
 
 function playWrongSound() {
   try {
     const ctx = getAudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sine';
+    const t = ctx.currentTime;
     // 下降兩音：Mi → Do
-    osc.frequency.setValueAtTime(330, ctx.currentTime);       // E4
-    osc.frequency.setValueAtTime(262, ctx.currentTime + 0.15); // C4
-    gain.gain.setValueAtTime(0.3, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 0.4);
+    playTone(330, t, 0.18, ctx, ctx.destination);        // E4
+    playTone(262, t + 0.18, 0.25, ctx, ctx.destination); // C4
   } catch (e) { /* 音效失敗不影響遊戲 */ }
 }
 
@@ -539,14 +536,10 @@ function checkSetClockAnswer(user, correct, difficulty) {
     return { isCorrect: false, message: '答錯了，正確答案是 ' + formatAnswerText(correct.hour, correct.minute) };
   }
 
-  let tolerance = 0;
-  if (difficulty === 'easy') tolerance = 2;
-  else if (difficulty === 'normal') tolerance = 1;
-
   const diff = Math.abs(user.minute - correct.minute);
   const minDiff = Math.min(diff, 60 - diff);
 
-  if (minDiff <= tolerance) {
+  if (minDiff === 0) {
     return { isCorrect: true, message: '答對了！' };
   }
   return { isCorrect: false, message: '答錯了，正確答案是 ' + formatAnswerText(correct.hour, correct.minute) };
